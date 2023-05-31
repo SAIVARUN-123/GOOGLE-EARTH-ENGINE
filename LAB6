@@ -1,0 +1,81 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var roi = /* color: #d63000 */ee.Geometry.Point([77.19106799161064, 32.29119272668693]),
+    l8 = ee.ImageCollection("LANDSAT/LC08/C01/T1_SR"),
+    mountain = 
+    /* color: #98ff00 */
+    /* displayProperties: [
+      {
+        "type": "rectangle"
+      }
+    ] */
+    ee.Feature(
+        ee.Geometry.Polygon(
+            [[[77.14431335359637, 32.24851523138791],
+              [77.14431335359637, 32.23283431089448],
+              [77.16662933260028, 32.23283431089448],
+              [77.16662933260028, 32.24851523138791]]], null, false),
+        {
+          "label": "mountain",
+          "system:index": "0"
+        }),
+    water = 
+    /* color: #0b4a8b */
+    /* displayProperties: [
+      {
+        "type": "rectangle"
+      }
+    ] */
+    ee.Feature(
+        ee.Geometry.Polygon(
+            [[[76.44998979405015, 31.428036753373963],
+              [76.44998979405015, 31.413534317707985],
+              [76.46904420689195, 31.413534317707985],
+              [76.46904420689195, 31.428036753373963]]], null, false),
+        {
+          "label": "water",
+          "system:index": "0"
+        }),
+    city = 
+    /* color: #ffc82d */
+    /* displayProperties: [
+      {
+        "type": "rectangle"
+      }
+    ] */
+    ee.Feature(
+        ee.Geometry.Polygon(
+            [[[77.16833873539076, 32.29532042593837],
+              [77.16833873539076, 32.28875412800441],
+              [77.17653556614027, 32.28875412800441],
+              [77.17653556614027, 32.29532042593837]]], null, false),
+        {
+          "label": "city",
+          "system:index": "0"
+        });
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+var image = ee.Image(l8
+    .filterBounds(roi)
+    .filterDate('2016-05-01', '2016-06-30')
+    .sort('CLOUD_COVER')
+    .first());
+print(image);
+Map.centerObject(roi,12);
+Map.addLayer(image, {bands: ['B4', 'B3', 'B2'],min:0, max: 3000}, 'True colour image');
+var subset = image.select('B[1-7]')
+var samples = ee.FeatureCollection([mountain,water,city]);
+var Chart1 = ui.Chart.image.regions(
+    subset, samples, ee.Reducer.mean(), 10, 'label')
+        .setChartType('ScatterChart');
+print(Chart1);
+var plotOptions = {
+  title: 'Landsat-8  Surface reflectance spectra',
+  hAxis: {title: 'Wavelength (nanometers)'},
+  vAxis: {title: 'Reflectance'},
+  lineWidth: 1,
+  pointSize: 4,
+  series: {
+    0: {color: 'green'}, // Mountain
+    1: {color: 'blue'}, // Water
+    2: {color: 'red'}, // City
+}};
+var wavelengths = [443, 482, 562, 655, 865, 1609, 2201];

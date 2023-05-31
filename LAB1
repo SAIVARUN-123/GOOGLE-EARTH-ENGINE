@@ -1,0 +1,30 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var roi = ee.FeatureCollection("users/SAIVARUN/nilgiris");
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+var srtm = ee.Image("USGS/SRTMGL1_003")
+var hillshade = ee.Terrain.hillshade(srtm);
+var slope = ee.Terrain.slope(srtm);
+print(srtm);
+Map.centerObject(roi,10);
+// Map.addLayer(srtm.clip(roi),{min:-10,max:6500},'SRTM');
+Map.addLayer(srtm.clip(roi),{min:-10,max:6500,palette:['red','green','blue']},'Elevation above sea level');
+Map.addLayer(hillshade.clip(roi),{min:145,max:255},'hillShade');
+Map.addLayer(slope.clip(roi),{min:0,max:20},'slope');
+Export.image.toDrive({
+  image: slope.clip(roi).visualize({min: 0, max: 20}),
+  description:'Slope',
+  scale: 20,
+  region: roi
+});
+Export.image.toDrive({
+  image: hillshade.clip(roi).visualize({min: 145, max: 255}),
+  description:'Hillshade1',
+  scale: 20,
+  region: roi
+});
+Export.image.toDrive({
+  image: srtm.clip(roi).visualize({min:-10,max:6500,palette:['red','green','blue']}),
+  description:'Elevation above Seavel',
+  scale: 20,
+  region: roi
+});

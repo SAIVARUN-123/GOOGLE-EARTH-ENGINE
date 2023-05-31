@@ -1,0 +1,21 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var roi = ee.FeatureCollection("users/SAIVARUN/nilgiris");
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+// var l8 = ee.ImageCollection("LANDSAT/LC08/C02/T1_TOA");
+var s2 = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED");
+var image=ee.Image(s2.filterBounds(roi)
+.filterDate("2023-01-02","2023-01-15")
+.sort('CLOUD_COVER_ASSMENT').first());
+print(image);
+Map.centerObject(roi,10);
+Map.addLayer(image.clip(roi),{bands:['B4','B3','B2'],min:0,max:1000},"l8");
+var bands=['B4','B3','B2'];
+var i2=image.select(bands).clip(roi);
+print(i2);
+
+Export.image.toDrive({
+  image: i2.visualize({min: 0, max: 1000, bands:['B4','B3','B2']}),
+  description:'Ooty',
+  scale: 20,
+  region: roi
+});

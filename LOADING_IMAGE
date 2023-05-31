@@ -1,0 +1,14 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var roi = /* color: #d63000 */ee.Geometry.LinearRing(
+        [[79.98772191645747, 14.929018578021703],
+         [79.98597856086336, 14.90927949037413],
+         [80.00108476203523, 14.90845007728836],
+         [80.00400300544344, 14.928355108710733],
+         [79.98772191645747, 14.929018578021703]]),
+    L8 = ee.ImageCollection("LANDSAT/LC08/C02/T1_RT_TOA");
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+var image=ee.Image(L8.filterDate("2013-03-18").filterBounds(roi).sort("CLOUD_COVER"));
+print(image);
+var trueColour={bands:["B4","B3","B2"],min:500,max:12000};
+Map.centerObject(roi,12);
+Map.addLayer(image,trueColour,"true image");

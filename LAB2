@@ -1,0 +1,37 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var roi = ee.FeatureCollection("users/SAIVARUN/nilgiris");
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+var image = ee.ImageCollection("COPERNICUS/S2");
+var ooty=ee.Image(image.filterBounds(roi)
+.filterDate("2023-01-02","2023-01-15")
+.sort('CLOUD_COVER').first());
+print(ooty);
+Map.centerObject(roi,10);
+Map.addLayer(ooty.clip(roi),{bands:['B4','B3','B2'], min:0, max:3000}, "True-colour");
+Map.addLayer(ooty.clip(roi),{bands:['B8','B4','B3'], min:0, max:3000}, "False-colour");
+Map.addLayer(ooty.clip(roi),{bands:['B12','B11','B4'], min:0, max:3000}, "False-coloururban");
+Map.addLayer(ooty.clip(roi),{bands:['B11','B8','B2'], min:0, max:3000}, "Agriculture");
+Export.image.toDrive({
+ image: ooty.clip(roi).visualize({bands:['B4','B3','B2'], min: 0, max: 3000}),
+ description:'True Colour',
+ scale: 20,
+ region: roi
+});
+Export.image.toDrive({
+ image: ooty.clip(roi).visualize({bands:['B8','B4','B3'], min: 0, max: 3000}),
+ description:'False Colour',
+ scale: 20,
+ region: roi
+});
+Export.image.toDrive({
+ image: ooty.clip(roi).visualize({bands:['B12','B11','B4'], min: 0, max: 3000}),
+ description:'False coloururban',
+ scale: 20,
+ region: roi
+});
+Export.image.toDrive({
+ image: ooty.clip(roi).visualize({bands:['B11','B8','B2'], min: 0, max: 3000}),
+ description:'Agriculture',
+ scale: 20,
+ region: roi
+});

@@ -1,0 +1,22 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var S2 = ee.ImageCollection("COPERNICUS/S2_SR"),
+    ROI = ee.FeatureCollection("users/SAIVARUN/nilgiris");
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+var image = ee.Image(S2.filterDate('2022-05-01','2022-05-10')
+  .filterBounds(ROI)
+  .sort('CLOUD_COVER').median());
+Map.centerObject(ROI,10);
+Map.addLayer(image.clip(ROI),{bands:['B4','B3','B2'],min:0,max:3000},'TRUE IMAGE');
+var NDVI=image.expression("(NIR-RED)/(NIR+RED)",
+{
+  NIR:image.select('B8'),
+  RED:image.select('B4'),
+});
+Map.addLayer(NDVI.clip(ROI),{palette: ['blue', 'white', 'green'],min:-1,max:1},'NDVI');
+
+Export.image.toDrive({
+image: NDVI.clip(ROI).visualize({palette: ['blue', 'white', 'green'],min:-1,max:1}),
+description:'NDVI',
+scale: 20,
+region: ROI
+});
